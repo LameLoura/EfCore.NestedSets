@@ -16,5 +16,6 @@ namespace EfCore.NestedSets
         TNullableKey RootId { get; set; }
         List<T> Children { get; set; }
         List<T> Descendants { get; set; }
+        TNullableKey EntryKey { get; set; }
     }
 }

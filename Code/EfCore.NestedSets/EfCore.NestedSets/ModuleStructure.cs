@@ -19,6 +19,8 @@ namespace EfCore.NestedSets.Tests
         public ModuleStructure Root { get; set; }
         public int? RootId { get; set; }
 
+        public int? EntryKey { get; set; }
+
         public ModuleStructure() { }
 
         public ModuleStructure(string name, int? parentId, int level, int left, int right)

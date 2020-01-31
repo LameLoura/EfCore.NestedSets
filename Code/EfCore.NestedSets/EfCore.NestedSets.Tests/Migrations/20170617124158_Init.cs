@@ -20,7 +20,8 @@ namespace EfCore.NestedSets.Tests.Migrations
                     Name = table.Column<string>(nullable: true),
                     ParentId = table.Column<int>(nullable: true),
                     Right = table.Column<int>(nullable: false),
-                    RootId = table.Column<int>(nullable: true)
+                    RootId = table.Column<int>(nullable: true),
+                    EntryKey = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,7 +52,8 @@ namespace EfCore.NestedSets.Tests.Migrations
                     Name = table.Column<string>(nullable: true),
                     ParentId = table.Column<int>(nullable: true),
                     Right = table.Column<int>(nullable: false),
-                    RootId = table.Column<int>(nullable: true)
+                    RootId = table.Column<int>(nullable: true),
+                    EntryKey = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

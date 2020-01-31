@@ -16,6 +16,7 @@ namespace EfCore.NestedSets.Tests
         public bool Moving { get; set; }
         public Node Root { get; set; }
         public int? RootId { get; set; }
+        public int? EntryKey { get; set; }
 
         public Node() { }
 
