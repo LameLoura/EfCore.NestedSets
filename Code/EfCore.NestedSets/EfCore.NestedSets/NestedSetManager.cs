@@ -81,6 +81,7 @@ namespace EfCore.NestedSets
                 deletedNode.Left -= minLeft;
                 deletedNode.Right -= minLeft;
                 deletedNode.ParentId = default(TNullableKey);
+                deletedNode.EntryKey = default(TNullableKey);
             }
             if (!soft)
             {
@@ -199,6 +200,7 @@ namespace EfCore.NestedSets
             int? siblingLeft = null;
             int? siblingRight = null;
             var rootId = default(TNullableKey);
+            var entryKey = default(TNullableKey);
             if (!Equals(siblingId, default(TNullableKey)))
             {
                 if (sibling == null)
@@ -209,6 +211,7 @@ namespace EfCore.NestedSets
                 siblingRight = sibling.Right;
                 parentId = sibling.ParentId;
                 rootId = sibling.RootId;
+                entryKey = sibling.EntryKey;
             }
             int? parentLeft = null;
             if (!Equals(parentId, default(TNullableKey)))
@@ -219,6 +222,7 @@ namespace EfCore.NestedSets
                 }
                 parentLeft = parent.Left;
                 rootId = parent.RootId;
+                entryKey = parent.EntryKey;
             }
             var minLevel = nodeArray.Min(n => n.Level);
             foreach (var node in nodeArray)
@@ -341,6 +345,7 @@ namespace EfCore.NestedSets
                 nodeTreeRoot.EntryKey = nodeTreeRoot.EntryKey;
                 _db.SaveChanges();
             }
+            // insert a child node
             else if (Equals(rootId, default(TNullableKey)))
             {
                 var rootIds = newNodes.Select(n => n.RootId).Distinct().ToArray();
@@ -355,11 +360,13 @@ namespace EfCore.NestedSets
                     //nodeTreeRoot.RootId = rootId;//ToNullableKey(GetNodes(rootId).Single(n => n.Left == 1).Id);
                 }
             }
+            //if rootId exist, applies them to all of the new node
             if (!Equals(rootId, default(TNullableKey)))
             {
                 foreach (var newNode in newNodes)
                 {
                     newNode.RootId = rootId;
+                    newNode.EntryKey = entryKey;
                 }
                 _db.SaveChanges();
             }
