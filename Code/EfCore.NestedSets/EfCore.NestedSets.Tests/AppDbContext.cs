@@ -5,6 +5,7 @@ namespace EfCore.NestedSets.Tests
     public class AppDbContext : DbContext
     {
         public DbSet<Node> Nodes { get; set; }
+        public DbSet<ModuleStructure> ModuleStructures { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -9,6 +9,7 @@ namespace EfCore.NestedSets.Tests
     public class NodeActionTests
     {
         NestedSetManager<AppDbContext, Node, int, int?> _ns;
+        NestedSetManager<AppDbContext, ModuleStructure, int, int?> _nodeStrcutManager;
         private AppDbContext _db;
         public Node Animals { get; set; }
         public Node Humans { get; set; }
@@ -54,6 +55,9 @@ namespace EfCore.NestedSets.Tests
             DbSql.RunDbSql("DELETE FROM Nodes");
             _db = new AppDbContext();
             _ns = new NestedSetManager<AppDbContext, Node, int, int?>(_db, d => d.Nodes);
+            _nodeStrcutManager =
+                new NestedSetManager<AppDbContext, ModuleStructure, int, int?>
+                (_db, d => d.ModuleStructures);
         }
 
         [TestCleanup]
@@ -72,6 +76,15 @@ namespace EfCore.NestedSets.Tests
         {
             Animals = _ns.InsertRoot(NewNode("Animals"), NestedSetInsertMode.Right);
             AssertDb(Animals.RootId, new Node(Animals.Name, null, 0, 1, 2));
+
+        }
+
+        [TestMethod]
+        public void TestMyOwn()
+        {
+            //test
+            ModuleStructure root = new ModuleStructure { Name = "2 More Ultimate Potatoes!" };
+            root = _nodeStrcutManager.InsertRoot(root, NestedSetInsertMode.Right);
         }
 
         [TestMethod]

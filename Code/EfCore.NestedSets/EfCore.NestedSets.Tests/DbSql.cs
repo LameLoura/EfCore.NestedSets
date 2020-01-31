@@ -78,9 +78,9 @@ END
 CREATE DATABASE [EfCore.NestedSet.Tests]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'EfCore.NestedSet.Tests', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\EfCore.NestedSet.Tests.mdf' , SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+( NAME = N'EfCore.NestedSet.Tests', FILENAME = N'C:\dev\sql.developer\MSSQL15.MSSQLSERVER\MSSQL\DATA\EfCore.NestedSet.Tests.mdf' , SIZE = 5120KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
  LOG ON 
-( NAME = N'EfCore.NestedSet.Tests_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\EfCore.NestedSet.Tests_log.ldf' , SIZE = 1024KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+( NAME = N'EfCore.NestedSet.Tests_log', FILENAME = N'C:\dev\sql.developer\MSSQL15.MSSQLSERVER\MSSQL\DATA\EfCore.NestedSet.Tests_log.ldf' , SIZE = 1024KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
 GO
 ALTER DATABASE [EfCore.NestedSet.Tests] SET COMPATIBILITY_LEVEL = 120
 GO
