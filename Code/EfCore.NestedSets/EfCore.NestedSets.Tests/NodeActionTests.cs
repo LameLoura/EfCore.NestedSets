@@ -74,7 +74,7 @@ namespace EfCore.NestedSets.Tests
         [TestMethod]
         public void TestInsertRoot()
         {
-            Animals = _ns.InsertRoot(NewNode("Animals"), NestedSetInsertMode.Right);
+            Animals = _ns.InsertRoot(NewNode("Animals"), ModulStructureTests.getTestEntry(), NestedSetInsertMode.Right);
             AssertDb(Animals.RootId, new Node(Animals.Name, null, 0, 1, 2));
 
         }
@@ -84,7 +84,7 @@ namespace EfCore.NestedSets.Tests
         {
             //test
             ModuleStructure root = new ModuleStructure { Name = "2 More Ultimate Potatoes!" };
-            root = _nodeStrcutManager.InsertRoot(root, NestedSetInsertMode.Right);
+            root = _nodeStrcutManager.InsertRoot(root, ModulStructureTests.getTestEntry(), NestedSetInsertMode.Right);
         }
 
         [TestMethod]

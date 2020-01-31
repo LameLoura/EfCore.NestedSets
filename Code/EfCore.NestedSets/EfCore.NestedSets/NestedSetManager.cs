@@ -111,12 +111,14 @@ namespace EfCore.NestedSets
             Insert(toParentId, toSiblingId, deletedNodes, insertMode);
         }
 
-        public T InsertRoot(T node,
+        public T InsertRoot(T node, TNullableKey entryKey,
             NestedSetInsertMode insertMode)
         {
+            node.EntryKey = entryKey;
             return Insert(default(TNullableKey), default(TNullableKey), new[] { node }, insertMode).First();
         }
 
+        // Multiple insert - Has not been tested yet. Might not be fully supported.
         public List<T> InsertRoot(IEnumerable<T> nodeTree,
             NestedSetInsertMode insertMode)
         {
@@ -336,6 +338,7 @@ namespace EfCore.NestedSets
             {
                 nodeTreeRoot.RootId = ToNullableKey(nodeTreeRoot.Id);
                 nodeTreeRoot.Root = nodeTreeRoot;
+                nodeTreeRoot.EntryKey = nodeTreeRoot.EntryKey;
                 _db.SaveChanges();
             }
             else if (Equals(rootId, default(TNullableKey)))
