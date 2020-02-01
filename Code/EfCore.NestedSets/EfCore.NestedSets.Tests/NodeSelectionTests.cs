@@ -8,12 +8,12 @@ namespace EfCore.NestedSets.Tests
     public class NodeSelectionTests
     {
         private NodeActionTests _nat;
-        NestedSetManager<AppDbContext, Node, Module, int, int?> _ns;
+        NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?> _ns;
 
         public NodeSelectionTests()
         {
             _nat = new NodeActionTests();
-            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(
+            _ns = new NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?>(
                 new AppDbContext(), db => db.ModuleStructures, db => db.Modules);
         }
 
@@ -183,17 +183,17 @@ namespace EfCore.NestedSets.Tests
         // TODO:
         // Test selecting X levels deep
         // Test 
-        private static void AssertResultsAndOrder(IEnumerable<Node> nodesQuery, params Node[] expectedNodes)
+        private static void AssertResultsAndOrder(IEnumerable<ModuleStructure> nodesQuery, params ModuleStructure[] expectedNodes)
         {
             AssertResults(nodesQuery, true, expectedNodes);
         }
 
-        private static void AssertResults(IEnumerable<Node> nodesQuery, params Node[] expectedNodes)
+        private static void AssertResults(IEnumerable<ModuleStructure> nodesQuery, params ModuleStructure[] expectedNodes)
         {
             AssertResults(nodesQuery, false, expectedNodes);
         }
 
-        private static void AssertResults(IEnumerable<Node> nodesQuery, bool checkOrder, params Node[] expectedNodes)
+        private static void AssertResults(IEnumerable<ModuleStructure> nodesQuery, bool checkOrder, params ModuleStructure[] expectedNodes)
         {
             var actualNodes = nodesQuery.ToList();
             Assert.AreEqual(actualNodes.Count, actualNodes.Count);

@@ -4,7 +4,7 @@ namespace EfCore.NestedSets.Tests
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Node> ModuleStructures { get; set; }
+        public DbSet<ModuleStructure> ModuleStructures { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<ModuleEntry> ModuleEntries { get; set; }
 
@@ -16,7 +16,7 @@ namespace EfCore.NestedSets.Tests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ConfigureNestedSets<Node, Module, int, int?>();
+            modelBuilder.ConfigureNestedSets<ModuleStructure, Module, int, int?>();
         }
     }
 }
