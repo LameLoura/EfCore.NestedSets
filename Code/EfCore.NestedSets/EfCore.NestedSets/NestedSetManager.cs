@@ -7,23 +7,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.NestedSets
 {
-    public class NestedSetManager<TDbContext, T, TKey, TNullableKey>
-        where T : class, INestedSet<T, TKey, TNullableKey>
+    public class NestedSetManager<TDbContext, T, TNode, TKey, TNullableKey>
+        where T : class, INestedSet<T, TNode, TKey, TNullableKey>
         where TDbContext : DbContext
     {
         private readonly DbContext _db;
+        private readonly DbSet<T> _nodesSet;
+
 
         private static IQueryable<T> QueryById(IQueryable<T> nodes, TKey id)
         {
-            return nodes.Where(_PropertyEqualsExpression(nameof(INestedSet<T, TKey, TNullableKey>.Id), id));
+            return nodes.Where(_PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.Id), id));
         }
 
         private IQueryable<T> GetNodes(TNullableKey rootId)
         {
-            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TKey, TNullableKey>.RootId), rootId));
+            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.RootId), rootId));
         }
-
-        private readonly DbSet<T> _nodesSet;
 
         public NestedSetManager(TDbContext dbContext, Expression<Func<TDbContext, DbSet<T>>> nodesSourceExpression)
         {
@@ -112,6 +112,7 @@ namespace EfCore.NestedSets
             Insert(toParentId, toSiblingId, deletedNodes, insertMode);
         }
 
+        //TODO change entryKey type to ME
         public T InsertRoot(T node, TNullableKey entryKey,
             NestedSetInsertMode insertMode)
         {
@@ -435,7 +436,7 @@ namespace EfCore.NestedSets
         /// <returns></returns>
         public IQueryable<T> GetImmediateChildren(TKey nodeId)
         {
-            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TKey, TNullableKey>.ParentId), (TNullableKey)(object)nodeId));
+            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.ParentId), (TNullableKey)(object)nodeId));
         }
 
         /// <summary>
@@ -496,7 +497,7 @@ namespace EfCore.NestedSets
 
         private T GetNode(TKey id)
         {
-            return _nodesSet.Single(PropertyEqualsExpression(nameof(INestedSet<T, TKey, TNullableKey>.Id), id));
+            return _nodesSet.Single(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.Id), id));
         }
     }
 }

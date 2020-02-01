@@ -8,12 +8,12 @@ namespace EfCore.NestedSets.Tests
     public class NodeSelectionTests
     {
         private NodeActionTests _nat;
-        NestedSetManager<AppDbContext, Node, int, int?> _ns;
+        NestedSetManager<AppDbContext, Node, Module, int, int?> _ns;
 
         public NodeSelectionTests()
         {
             _nat = new NodeActionTests();
-            _ns = new NestedSetManager<AppDbContext, Node, int, int?>(
+            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(
                 new AppDbContext(), db => db.Nodes);
         }
 

@@ -11,13 +11,18 @@ namespace EfCore.NestedSets.Tests
         //public static int TestEntryId = 133;
 
         private static int lol = 12;
-        public static int getTestEntry()
+        public ModuleEntry getTestEntry()
         {
-            return ++lol;
+            lol++;
+            //_db.ModuleEntries
+            ModuleEntry newEntry = new ModuleEntry();
+            newEntry.Label = "Entry number: " + lol;
+            _db.SaveChanges();
+            return newEntry;
         }
 
-        NestedSetManager<AppDbContext, Node, int, int?> _ns;
-        NestedSetManager<AppDbContext, ModuleStructure, int, int?> _nodeStrcutManager;
+        NestedSetManager<AppDbContext, Node, Module, int, int?> _ns;
+        NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?> _nodeStrcutManager;
         private AppDbContext _db;
   
 
@@ -30,9 +35,9 @@ namespace EfCore.NestedSets.Tests
             // the results of the last test
             DbSql.RunDbSql("DELETE FROM Nodes");
             _db = new AppDbContext();
-            _ns = new NestedSetManager<AppDbContext, Node, int, int?>(_db, d => d.Nodes);
+            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.Nodes);
             _nodeStrcutManager =
-                new NestedSetManager<AppDbContext, ModuleStructure, int, int?>
+                new NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?>
                 (_db, d => d.ModuleStructures);
         }
 
@@ -47,7 +52,8 @@ namespace EfCore.NestedSets.Tests
         {
             //test
             ModuleStructure root = new ModuleStructure { Name = "4 More Ultimate Potatoes!" };
-            root = _nodeStrcutManager.InsertRoot(root, ModulStructureTests.getTestEntry(), NestedSetInsertMode.Right);
+            ModuleEntry entry = getTestEntry();
+            root = _nodeStrcutManager.InsertRoot(root, entry.Id, NestedSetInsertMode.Right);
         }
 
         private static void AssertDb(int? rootId, params Node[] expectedNodes)

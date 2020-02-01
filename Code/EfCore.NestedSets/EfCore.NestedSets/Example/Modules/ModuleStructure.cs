@@ -3,9 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EfCore.NestedSets.Tests
 {
-    public class ModuleStructure : INestedSet<ModuleStructure, int, int?>
+    public class ModuleStructure : INestedSet<ModuleStructure, Module, int, int?>
     {
         public int Id { get; set; }
+        public int? NodeInstanceId { get; set; }
+        public Module NodeInstance { get; set; }
         public ModuleStructure Parent { get; set; }
         public List<ModuleStructure> Children { get; set; }
         public List<ModuleStructure> Descendants { get; set; }

@@ -2,9 +2,11 @@
 
 namespace EfCore.NestedSets.Tests
 {
-    public class Node : INestedSet<Node, int, int?>
+    public class Node : INestedSet<Node, Module, int, int?>
     {
         public int Id { get; set; }
+        public int? NodeInstanceId { get; set; }
+        public Module NodeInstance { get; set; }
         public Node Parent { get; set; }
         public List<Node> Children { get; set; }
         public List<Node> Descendants { get; set; }

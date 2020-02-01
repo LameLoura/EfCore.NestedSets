@@ -5,8 +5,8 @@ namespace EfCore.NestedSets
 {
     public static class EfCoreNestedSetsModelBuilderExtensions
     {
-        public static void ConfigureNestedSets<T, TKey, TNullableKey>(this ModelBuilder modelBuilder)
-            where T : class, INestedSet<T, TKey, TNullableKey>
+        public static void ConfigureNestedSets<T, TNode, TKey, TNullableKey>(this ModelBuilder modelBuilder)
+            where T : class, INestedSet<T, TNode, TKey, TNullableKey>
         {
             modelBuilder.Entity<T>()
                 .Ignore(b => b.Moving);

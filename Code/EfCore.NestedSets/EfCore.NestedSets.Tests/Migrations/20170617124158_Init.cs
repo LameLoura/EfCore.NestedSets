@@ -40,6 +40,21 @@ namespace EfCore.NestedSets.Tests.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+               name: "ModuleEntries",
+               columns: table => new
+               {
+                   Id = table.Column<int>(nullable: false)
+                       .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                   Label = table.Column<string>(nullable: false)/*,
+                   IsDeleted = table.Column<int>(nullable: false),
+                   CreatedDate = table.Column<DateTime>(nullable: true),
+                   UpdatedDate = table.Column<DateTime>(nullable: true)*/
+               },
+               constraints: table =>
+               {
+                   table.PrimaryKey("PK_ModuleEntries", x => x.Id);
+               });
 
             migrationBuilder.CreateTable(
                 name: "ModuleStructures",
@@ -58,6 +73,13 @@ namespace EfCore.NestedSets.Tests.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ModuleStructures", x => x.Id);
+                    // link to 
+                    table.ForeignKey(
+                        name: "FK_ModuleStructures_ModuleEntries_RootEntry",
+                        column: x => x.EntryKey,
+                        principalTable: "ModuleEntries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ModuleStructures_ModuleStructures_ParentId",
                         column: x => x.ParentId,
