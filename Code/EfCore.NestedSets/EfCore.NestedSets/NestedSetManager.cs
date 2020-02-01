@@ -9,7 +9,7 @@ namespace EfCore.NestedSets
 {
     public class NestedSetManager<TDbContext, TNodeStructure, TNode, TKey, TNullableKey>
         where TNodeStructure : class, INestedSet<TNodeStructure, TNode, TKey, TNullableKey>
-        where TNode : class, INode, new()
+        where TNode : class
         where TDbContext : DbContext
     {
         private readonly DbContext _db;

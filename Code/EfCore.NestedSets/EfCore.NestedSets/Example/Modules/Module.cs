@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EfCore.NestedSets.Tests
 {
-    public class Module : INode
+    public class Module
     {
         public int Id { get; set; }
         public string Label { get; set; }
