@@ -18,7 +18,7 @@ namespace EfCore.NestedSets.Tests.Migrations
                 .HasAnnotation("ProductVersion", "2.0.0-preview1-24937")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("EfCore.NestedSets.Tests.Node", b =>
+            modelBuilder.Entity("EfCore.NestedSets.Tests.ModuleStructures", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -41,16 +41,16 @@ namespace EfCore.NestedSets.Tests.Migrations
 
                     b.HasIndex("RootId");
 
-                    b.ToTable("Nodes");
+                    b.ToTable("ModuleStructures");
                 });
 
-            modelBuilder.Entity("EfCore.NestedSets.Tests.Node", b =>
+            modelBuilder.Entity("EfCore.NestedSets.Tests.ModuleStructures", b =>
                 {
-                    b.HasOne("EfCore.NestedSets.Tests.Node", "Parent")
+                    b.HasOne("EfCore.NestedSets.Tests.ModuleStructures", "Parent")
                         .WithMany("Children")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("EfCore.NestedSets.Tests.Node", "Root")
+                    b.HasOne("EfCore.NestedSets.Tests.ModuleStructures", "Root")
                         .WithMany("Descendants")
                         .HasForeignKey("RootId");
                 });

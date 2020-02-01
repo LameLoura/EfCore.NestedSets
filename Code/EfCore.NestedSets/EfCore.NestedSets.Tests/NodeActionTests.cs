@@ -9,7 +9,6 @@ namespace EfCore.NestedSets.Tests
     public class NodeActionTests
     {
         NestedSetManager<AppDbContext, Node, Module, int, int?> _ns;
-        NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?> _nodeStrcutManager;
         private AppDbContext _db;
         public Node Animals { get; set; }
         public Node Humans { get; set; }
@@ -52,13 +51,10 @@ namespace EfCore.NestedSets.Tests
             // Clean up from the last test, but do this on set-up not
             // tear-down so it is possible to inspect the database with
             // the results of the last test
-            DbSql.RunDbSql("DELETE FROM Nodes");
+            DbSql.RunDbSql("DELETE FROM ModuleStructures");
             DbSql.RunDbSql("DELETE FROM Modules");
             _db = new AppDbContext();
-            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.Nodes, d => d.Modules);
-            _nodeStrcutManager =
-                new NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?>
-                (_db, d => d.ModuleStructures, d => d.Modules);
+            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.ModuleStructures, d => d.Modules);
         }
 
         [TestCleanup]
@@ -464,7 +460,7 @@ namespace EfCore.NestedSets.Tests
         {
             using (var db = new AppDbContext())
             {
-                var nodes = db.Nodes.Where(n => n.RootId == rootId);
+                var nodes = db.ModuleStructures.Where(n => n.RootId == rootId);
                 Assert.AreEqual(expectedNodes.Length, nodes.Count());
                 for (var i = 0; i < expectedNodes.Length; i++)
                 {

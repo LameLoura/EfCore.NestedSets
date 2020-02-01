@@ -4,8 +4,7 @@ namespace EfCore.NestedSets.Tests
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<Node> Nodes { get; set; }
-        public DbSet<ModuleStructure> ModuleStructures { get; set; }
+        public DbSet<Node> ModuleStructures { get; set; }
         public DbSet<Module> Modules { get; set; }
         public DbSet<ModuleEntry> ModuleEntries { get; set; }
 
