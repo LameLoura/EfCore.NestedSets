@@ -35,10 +35,10 @@ namespace EfCore.NestedSets.Tests
             // the results of the last test
             DbSql.RunDbSql("DELETE FROM Nodes");
             _db = new AppDbContext();
-            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.Nodes);
+            _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.Nodes, d => d.Modules);
             _nodeStrcutManager =
                 new NestedSetManager<AppDbContext, ModuleStructure, Module, int, int?>
-                (_db, d => d.ModuleStructures);
+                (_db, d => d.ModuleStructures, d => d.Modules);
         }
 
         [TestCleanup]

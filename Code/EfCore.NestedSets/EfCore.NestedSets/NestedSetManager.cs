@@ -7,52 +7,60 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EfCore.NestedSets
 {
-    public class NestedSetManager<TDbContext, T, TNode, TKey, TNullableKey>
-        where T : class, INestedSet<T, TNode, TKey, TNullableKey>
+    public class NestedSetManager<TDbContext, TNodeStructure, TNode, TKey, TNullableKey>
+        where TNodeStructure : class, INestedSet<TNodeStructure, TNode, TKey, TNullableKey>
+        where TNode : class
         where TDbContext : DbContext
     {
         private readonly DbContext _db;
-        private readonly DbSet<T> _nodesSet;
+        private readonly DbSet<TNodeStructure> _nodeStructuresSet;
+        private readonly DbSet<TNode> _nodesSet;
 
 
-        private static IQueryable<T> QueryById(IQueryable<T> nodes, TKey id)
+        private static IQueryable<TNodeStructure> QueryById(IQueryable<TNodeStructure> nodes, TKey id)
         {
-            return nodes.Where(_PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.Id), id));
+            return nodes.Where(_PropertyEqualsExpression(nameof(INestedSet<TNodeStructure, TNode, TKey, TNullableKey>.Id), id));
         }
 
-        private IQueryable<T> GetNodes(TNullableKey rootId)
+        private IQueryable<TNodeStructure> GetNodes(TNullableKey rootId)
         {
-            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.RootId), rootId));
+            return _nodeStructuresSet.Where(PropertyEqualsExpression(nameof(INestedSet<TNodeStructure, TNode, TKey, TNullableKey>.RootId), rootId));
         }
 
-        public NestedSetManager(TDbContext dbContext, Expression<Func<TDbContext, DbSet<T>>> nodesSourceExpression)
+        public NestedSetManager(TDbContext dbContext, 
+            Expression<Func<TDbContext, DbSet<TNodeStructure>>> nodesStructureSourceExpression,
+            Expression<Func<TDbContext, DbSet<TNode>>> nodesSourceExpression)
         {
             _db = dbContext;
-            var propertyInfo = new PropertySelectorVisitor(nodesSourceExpression).Property;
-            _nodesSet = (DbSet<T>)propertyInfo.GetValue(dbContext);
+            var propertyInfo = new PropertySelectorVisitor(nodesStructureSourceExpression).Property;
+            _nodeStructuresSet = (DbSet<TNodeStructure>)propertyInfo.GetValue(dbContext);
+
+
+            var nodePropertyInfo = new PropertySelectorVisitor(nodesSourceExpression).Property;
+            _nodesSet = (DbSet<TNode>)propertyInfo.GetValue(dbContext);
         }
 
-        private Expression<Func<T, bool>> PropertyEqualsExpression(string propertyName, TKey key)
+        private Expression<Func<TNodeStructure, bool>> PropertyEqualsExpression(string propertyName, TKey key)
         {
             return _PropertyEqualsExpression(propertyName, key);
         }
 
-        private Expression<Func<T, bool>> PropertyEqualsExpression(string propertyName, TNullableKey key)
+        private Expression<Func<TNodeStructure, bool>> PropertyEqualsExpression(string propertyName, TNullableKey key)
         {
             return _PropertyEqualsExpression(propertyName, key);
         }
 
-        private static Expression<Func<T, bool>> _PropertyEqualsExpression<TField>(string propertyName, TField key)
+        private static Expression<Func<TNodeStructure, bool>> _PropertyEqualsExpression<TField>(string propertyName, TField key)
         {
-            var parameterExpression = Expression.Parameter(typeof(T), "entity");
+            var parameterExpression = Expression.Parameter(typeof(TNodeStructure), "entity");
             if (string.IsNullOrEmpty(propertyName))
                 throw new NotSupportedException();
-            return Expression.Lambda<Func<T, bool>>(
-                Expression.Equal(Expression.Property(parameterExpression, typeof(T), propertyName), Expression.Convert(Expression.Constant(key), typeof(TField))),
+            return Expression.Lambda<Func<TNodeStructure, bool>>(
+                Expression.Equal(Expression.Property(parameterExpression, typeof(TNodeStructure), propertyName), Expression.Convert(Expression.Constant(key), typeof(TField))),
                 parameterExpression);
         }
 
-        public List<T> Delete(TKey nodeId, bool soft = false)
+        public List<TNodeStructure> Delete(TKey nodeId, bool soft = false)
         {
             var nodeToDelete = GetNode(nodeId);
             var nodeToDeleteLeft = nodeToDelete.Left;
@@ -64,7 +72,7 @@ namespace EfCore.NestedSets
                     node.Moving = true;
             else
                 foreach (var node in deleted)
-                    _nodesSet.Remove(node);
+                    _nodeStructuresSet.Remove(node);
             var nodesToUpdate = GetNodes(rootId).Where(s => s.Left > nodeToDelete.Left || s.Right >= nodeToDelete.Left).ToList();
             foreach (var nodeToUpdate in nodesToUpdate)
             {
@@ -113,7 +121,7 @@ namespace EfCore.NestedSets
         }
 
         //TODO change entryKey type to ME
-        public T InsertRoot(T node, TNullableKey entryKey,
+        public TNodeStructure InsertRoot(TNodeStructure node, TNullableKey entryKey,
             NestedSetInsertMode insertMode)
         {
             node.EntryKey = entryKey;
@@ -121,40 +129,40 @@ namespace EfCore.NestedSets
         }
 
         // Multiple insert - Has not been tested yet. Might not be fully supported.
-        public List<T> InsertRoot(IEnumerable<T> nodeTree,
+        public List<TNodeStructure> InsertRoot(IEnumerable<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
             return Insert(default(TNullableKey), default(TNullableKey), nodeTree, insertMode);
         }
 
-        public T InsertBelow(TNullableKey parentId, T node,
+        public TNodeStructure InsertBelow(TNullableKey parentId, TNodeStructure node,
             NestedSetInsertMode insertMode)
         {
             return Insert(parentId, default(TNullableKey), new[] { node }, insertMode).First();
         }
 
-        public List<T> InsertBelow(TNullableKey parentId, IEnumerable<T> nodeTree,
+        public List<TNodeStructure> InsertBelow(TNullableKey parentId, IEnumerable<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
             return Insert(parentId, default(TNullableKey), nodeTree, insertMode);
         }
 
-        public T InsertNextTo(TNullableKey siblingId, T node,
+        public TNodeStructure InsertNextTo(TNullableKey siblingId, TNodeStructure node,
             NestedSetInsertMode insertMode)
         {
             return Insert(default(TNullableKey), siblingId, new[] { node }, insertMode).First();
         }
 
-        public T InsertNextTo(TNullableKey siblingId, List<T> nodeTree,
+        public TNodeStructure InsertNextTo(TNullableKey siblingId, List<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
             return Insert(default(TNullableKey), siblingId, nodeTree, insertMode).First();
         }
 
-        private List<T> Insert(TNullableKey parentId, TNullableKey siblingId, IEnumerable<T> nodeTree,
+        private List<TNodeStructure> Insert(TNullableKey parentId, TNullableKey siblingId, IEnumerable<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
-            var nodeArray = nodeTree as T[] ?? nodeTree.ToArray();
+            var nodeArray = nodeTree as TNodeStructure[] ?? nodeTree.ToArray();
             var lowestLeft = nodeArray.Min(n => n.Left);
             var highestRight = nodeArray.Max(n => n.Right);
             if (lowestLeft == 0 && highestRight == 0)
@@ -174,8 +182,8 @@ namespace EfCore.NestedSets
             }
             var difference = highestRight - lowestLeft;
             var nodeTreeRoot = nodeArray.Single(n => n.Left == lowestLeft);
-            T parent = null;
-            T sibling = null;
+            TNodeStructure parent = null;
+            TNodeStructure sibling = null;
             var isRoot = Equals(parentId, default(TNullableKey)) && Equals(siblingId, default(TNullableKey));
             if (!Equals(parentId, default(TNullableKey)) &&
                 insertMode == NestedSetInsertMode.Right)
@@ -240,7 +248,7 @@ namespace EfCore.NestedSets
             {
                 case NestedSetInsertMode.Left:
                     {
-                        IEnumerable<T> nodes;
+                        IEnumerable<TNodeStructure> nodes;
                         if (sibling != null)
                         {
                             nodes = GetNodes(rootId)
@@ -279,7 +287,7 @@ namespace EfCore.NestedSets
                     break;
                 case NestedSetInsertMode.Right:
                     {
-                        List<T> nodes;
+                        List<TNodeStructure> nodes;
                         if (sibling != null)
                         {
                             nodes = GetNodes(rootId)
@@ -330,7 +338,7 @@ namespace EfCore.NestedSets
             var newNodes = nodeArray.Where(n => !n.Moving).ToList();
             if (newNodes.Any())
             {
-                _nodesSet.AddRange(newNodes);
+                _nodeStructuresSet.AddRange(newNodes);
             }
             var movingNodes = nodeArray.Where(n => n.Moving).ToList();
             foreach (var node in movingNodes)
@@ -403,10 +411,10 @@ namespace EfCore.NestedSets
         /// </summary>
         /// <param name="nodeId">The node for which to find the path to</param>
         /// <returns></returns>
-        public IQueryable<T> GetDescendants(TKey nodeId, int? depth = null)
+        public IQueryable<TNodeStructure> GetDescendants(TKey nodeId, int? depth = null)
         {
             var node = GetNodeData(nodeId);
-            var query = _nodesSet.Where(n => n.Left > node.Left && n.Right < node.Right);
+            var query = _nodeStructuresSet.Where(n => n.Left > node.Left && n.Right < node.Right);
             if (depth.HasValue)
             {
                 query = query.Where(n => n.Level <= node.Level + depth.Value);
@@ -416,7 +424,7 @@ namespace EfCore.NestedSets
 
         private NodeData<TNullableKey> GetNodeData(TKey nodeId)
         {
-            var node = QueryById(_nodesSet, nodeId)
+            var node = QueryById(_nodeStructuresSet, nodeId)
                 .Select(n => new NodeData<TNullableKey> {Level = n.Level, Left = n.Left, Right = n.Right, RootId = n.RootId}).Single();
             return node;
         }
@@ -434,9 +442,9 @@ namespace EfCore.NestedSets
         /// </summary>
         /// <param name="nodeId">The node for which to find the path to</param>
         /// <returns></returns>
-        public IQueryable<T> GetImmediateChildren(TKey nodeId)
+        public IQueryable<TNodeStructure> GetImmediateChildren(TKey nodeId)
         {
-            return _nodesSet.Where(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.ParentId), (TNullableKey)(object)nodeId));
+            return _nodeStructuresSet.Where(PropertyEqualsExpression(nameof(INestedSet<TNodeStructure, TNode, TKey, TNullableKey>.ParentId), (TNullableKey)(object)nodeId));
         }
 
         /// <summary>
@@ -444,7 +452,7 @@ namespace EfCore.NestedSets
         /// </summary>
         /// <param name="nodeId">The node for which to find the path to</param>
         /// <returns></returns>
-        public IOrderedEnumerable<T> GetPathToNode(TKey nodeId)
+        public IOrderedEnumerable<TNodeStructure> GetPathToNode(TKey nodeId)
         {
             var node = GetNodeData(nodeId);
             return GetPathToNode(node, GetNodes(node.RootId));
@@ -455,7 +463,7 @@ namespace EfCore.NestedSets
         /// </summary>
         /// <param name="node">The node for which to find the path to</param>
         /// <returns></returns>
-        public IOrderedEnumerable<T> GetPathToNode(T node)
+        public IOrderedEnumerable<TNodeStructure> GetPathToNode(TNodeStructure node)
         {
             return GetPathToNode(node, GetNodes(node.RootId));
         }
@@ -466,12 +474,12 @@ namespace EfCore.NestedSets
         /// <param name="node">The node for which to find the path to</param>
         /// <param name="nodeSet">The set of nodes to limit the search to</param>
         /// <returns></returns>
-        public static IOrderedEnumerable<T> GetPathToNode(T node, IEnumerable<T> nodeSet)
+        public static IOrderedEnumerable<TNodeStructure> GetPathToNode(TNodeStructure node, IEnumerable<TNodeStructure> nodeSet)
         {
             return GetPathToNode(AsNodeData(node), nodeSet);
         }
 
-        private static NodeData<TNullableKey> AsNodeData(T node)
+        private static NodeData<TNullableKey> AsNodeData(TNodeStructure node)
         {
             return new NodeData<TNullableKey> {Left = node.Left, Right = node.Right, RootId = node.RootId};
         }
@@ -482,7 +490,7 @@ namespace EfCore.NestedSets
         /// <param name="node">The node for which to find the path to</param>
         /// <param name="nodeSet">The set of nodes to limit the search to</param>
         /// <returns></returns>
-        private static IOrderedEnumerable<T> GetPathToNode(NodeData<TNullableKey> node, IEnumerable<T> nodeSet)
+        private static IOrderedEnumerable<TNodeStructure> GetPathToNode(NodeData<TNullableKey> node, IEnumerable<TNodeStructure> nodeSet)
         {
             return nodeSet
                     .Where(n => n.Left < node.Left && n.Right > node.Right)
@@ -490,14 +498,14 @@ namespace EfCore.NestedSets
                 ;
         }
 
-        private T GetNode(TNullableKey id)
+        private TNodeStructure GetNode(TNullableKey id)
         {
             return GetNode((TKey)(object)id);
         }
 
-        private T GetNode(TKey id)
+        private TNodeStructure GetNode(TKey id)
         {
-            return _nodesSet.Single(PropertyEqualsExpression(nameof(INestedSet<T, TNode, TKey, TNullableKey>.Id), id));
+            return _nodeStructuresSet.Single(PropertyEqualsExpression(nameof(INestedSet<TNodeStructure, TNode, TKey, TNullableKey>.Id), id));
         }
     }
 }

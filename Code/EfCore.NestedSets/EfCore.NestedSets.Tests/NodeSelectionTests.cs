@@ -14,7 +14,7 @@ namespace EfCore.NestedSets.Tests
         {
             _nat = new NodeActionTests();
             _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(
-                new AppDbContext(), db => db.Nodes);
+                new AppDbContext(), db => db.Nodes, db => db.Modules);
         }
 
         [TestInitialize]
