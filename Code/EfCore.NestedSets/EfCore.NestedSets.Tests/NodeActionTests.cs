@@ -53,6 +53,7 @@ namespace EfCore.NestedSets.Tests
             // tear-down so it is possible to inspect the database with
             // the results of the last test
             DbSql.RunDbSql("DELETE FROM Nodes");
+            DbSql.RunDbSql("DELETE FROM Modules");
             _db = new AppDbContext();
             _ns = new NestedSetManager<AppDbContext, Node, Module, int, int?>(_db, d => d.Nodes, d => d.Modules);
             _nodeStrcutManager =

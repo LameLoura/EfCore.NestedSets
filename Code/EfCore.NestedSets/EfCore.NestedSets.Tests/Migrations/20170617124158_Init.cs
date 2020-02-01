@@ -9,6 +9,20 @@ namespace EfCore.NestedSets.Tests.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+
+            migrationBuilder.CreateTable(
+              name: "Modules",
+              columns: table => new
+              {
+                  Id = table.Column<int>(nullable: false)
+                      .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                  Label = table.Column<string>(nullable: false)
+              },
+              constraints: table =>
+              {
+                  table.PrimaryKey("PK_Modules", x => x.Id);
+              });
+
             migrationBuilder.CreateTable(
                 name: "Nodes",
                 columns: table => new
@@ -40,9 +54,9 @@ namespace EfCore.NestedSets.Tests.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Nodes_Module_RootId",
-                        column: x => x.RootId,
-                        principalTable: "Nodes",
+                        name: "FK_Nodes_Module_NodeInstanceId",
+                        column: x => x.NodeInstanceId,
+                        principalTable: "Modules",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -63,18 +77,6 @@ namespace EfCore.NestedSets.Tests.Migrations
                    table.PrimaryKey("PK_ModuleEntries", x => x.Id);
                });
 
-            migrationBuilder.CreateTable(
-              name: "Modules",
-              columns: table => new
-              {
-                  Id = table.Column<int>(nullable: false)
-                      .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                  Label = table.Column<string>(nullable: false)
-              },
-              constraints: table =>
-              {
-                  table.PrimaryKey("PK_Modules", x => x.Id);
-              });
 
             migrationBuilder.CreateTable(
                 name: "ModuleStructures",
