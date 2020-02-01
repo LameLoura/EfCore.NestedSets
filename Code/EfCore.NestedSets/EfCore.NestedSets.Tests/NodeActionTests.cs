@@ -66,9 +66,15 @@ namespace EfCore.NestedSets.Tests
             _db.Dispose();
         }
 
-        private static Node NewNode(string name)
+        private Node NewNode(string name)
         {
-            return new Node { Name = name };
+            Node newNode = new Node { Name = name };
+
+            Module associatedModule = new Module() { Label = name };
+            _db.Modules.Add(associatedModule);
+            _db.SaveChanges();
+            newNode.NodeInstance = associatedModule;
+            return newNode;
         }
 
         //public static ModuleEntry getTestEntry()
@@ -99,15 +105,6 @@ namespace EfCore.NestedSets.Tests
             Animals = _ns.InsertRoot(NewNode("Animals"), entry.Id, NestedSetInsertMode.Right);
             AssertDb(Animals.RootId, new Node(Animals.Name, null, 0, 1, 2));
 
-        }
-
-        [TestMethod]
-        public void TestMyOwn()
-        {
-            //test
-            ModuleStructure root = new ModuleStructure { Name = "2 More Ultimate Potatoes!" };
-            ModuleEntry entry = getTestEntry();
-            root = _nodeStrcutManager.InsertRoot(root, entry.Id, NestedSetInsertMode.Right);
         }
 
         [TestMethod]

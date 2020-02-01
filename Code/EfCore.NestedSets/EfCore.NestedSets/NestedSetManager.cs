@@ -163,18 +163,10 @@ namespace EfCore.NestedSets
         private List<TNodeStructure> Insert(TNullableKey parentId, TNullableKey siblingId, IEnumerable<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
-            //for all new node, create associated node instace
-            foreach(TNodeStructure nodeStructure in nodeTree)
+
+            if(nodeTree.Any( nodeStructure => nodeStructure.NodeInstance == null))
             {
-                //if doesn't have a valid instance yet, create them
-                if(!Equals(nodeStructure.NodeInstanceId, default(TKey)))
-                {
-                    //TODO provide the ID later
-                    TNode item = new TNode  { Label = "Test" };
-                    _nodesSet.Add(item);
-                    _db.SaveChanges();  //TODO improve performance
-                    nodeStructure.NodeInstanceId = item.Id;
-                }
+                throw new ArgumentException("Input node structure must have a valid node.");
             }
 
             var nodeArray = nodeTree as TNodeStructure[] ?? nodeTree.ToArray();
