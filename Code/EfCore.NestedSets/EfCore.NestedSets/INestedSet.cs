@@ -3,10 +3,10 @@ using System.Collections.Generic;
 namespace EfCore.NestedSets
 {
     public interface INestedSet<TNodeStructure, TNode, TKey, TNullableKey>
-        where TNodeStructure : INestedSet<TNodeStructure, TNode, TKey, TNullableKey>
+        where TNodeStructure : INestedSet<TNodeStructure, TNode, TKey, TNullableKey> // circular AF
     {
         TKey Id { get; set; }
-        TNullableKey NodeInstanceId { get; set; }
+        int? NodeInstanceId { get; set; } //TODO change to TKey
         TNode NodeInstance { get; set; }
         TNodeStructure Parent { get; set; }
         TNullableKey ParentId { get; set; }

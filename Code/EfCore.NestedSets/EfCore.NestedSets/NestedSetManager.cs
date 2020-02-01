@@ -9,7 +9,7 @@ namespace EfCore.NestedSets
 {
     public class NestedSetManager<TDbContext, TNodeStructure, TNode, TKey, TNullableKey>
         where TNodeStructure : class, INestedSet<TNodeStructure, TNode, TKey, TNullableKey>
-        where TNode : class
+        where TNode : class, INode, new()
         where TDbContext : DbContext
     {
         private readonly DbContext _db;
@@ -37,7 +37,8 @@ namespace EfCore.NestedSets
 
 
             var nodePropertyInfo = new PropertySelectorVisitor(nodesSourceExpression).Property;
-            _nodesSet = (DbSet<TNode>)propertyInfo.GetValue(dbContext);
+            _nodesSet = (DbSet<TNode>)nodePropertyInfo.GetValue(dbContext);
+            string potato = "portao";
         }
 
         private Expression<Func<TNodeStructure, bool>> PropertyEqualsExpression(string propertyName, TKey key)
@@ -162,6 +163,20 @@ namespace EfCore.NestedSets
         private List<TNodeStructure> Insert(TNullableKey parentId, TNullableKey siblingId, IEnumerable<TNodeStructure> nodeTree,
             NestedSetInsertMode insertMode)
         {
+            //for all new node, create associated node instace
+            foreach(TNodeStructure nodeStructure in nodeTree)
+            {
+                //if doesn't have a valid instance yet, create them
+                if(!Equals(nodeStructure.NodeInstanceId, default(TKey)))
+                {
+                    //TODO provide the ID later
+                    TNode item = new TNode  { Label = "Test" };
+                    _nodesSet.Add(item);
+                    _db.SaveChanges();  //TODO improve performance
+                    nodeStructure.NodeInstanceId = item.Id;
+                }
+            }
+
             var nodeArray = nodeTree as TNodeStructure[] ?? nodeTree.ToArray();
             var lowestLeft = nodeArray.Min(n => n.Left);
             var highestRight = nodeArray.Max(n => n.Right);

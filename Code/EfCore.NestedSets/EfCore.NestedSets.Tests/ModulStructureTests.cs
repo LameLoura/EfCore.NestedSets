@@ -15,8 +15,8 @@ namespace EfCore.NestedSets.Tests
         {
             lol++;
             //_db.ModuleEntries
-            ModuleEntry newEntry = new ModuleEntry();
-            newEntry.Label = "Entry number: " + lol;
+            ModuleEntry newEntry = new ModuleEntry{ Label = "Entry number: " + lol };
+            _db.ModuleEntries.Add(newEntry);
             _db.SaveChanges();
             return newEntry;
         }

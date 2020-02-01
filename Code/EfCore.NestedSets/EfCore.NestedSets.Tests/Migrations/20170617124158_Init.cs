@@ -21,7 +21,8 @@ namespace EfCore.NestedSets.Tests.Migrations
                     ParentId = table.Column<int>(nullable: true),
                     Right = table.Column<int>(nullable: false),
                     RootId = table.Column<int>(nullable: true),
-                    EntryKey = table.Column<int>(nullable: true)
+                    EntryKey = table.Column<int>(nullable: true),
+                    NodeInstanceId = table.Column<int>(nullable:true)
                 },
                 constraints: table =>
                 {
@@ -34,6 +35,12 @@ namespace EfCore.NestedSets.Tests.Migrations
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Nodes_Nodes_RootId",
+                        column: x => x.RootId,
+                        principalTable: "Nodes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Nodes_Module_RootId",
                         column: x => x.RootId,
                         principalTable: "Nodes",
                         principalColumn: "Id",
@@ -57,6 +64,19 @@ namespace EfCore.NestedSets.Tests.Migrations
                });
 
             migrationBuilder.CreateTable(
+              name: "Modules",
+              columns: table => new
+              {
+                  Id = table.Column<int>(nullable: false)
+                      .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                  Label = table.Column<string>(nullable: false)
+              },
+              constraints: table =>
+              {
+                  table.PrimaryKey("PK_Modules", x => x.Id);
+              });
+
+            migrationBuilder.CreateTable(
                 name: "ModuleStructures",
                 columns: table => new
                 {
@@ -68,7 +88,8 @@ namespace EfCore.NestedSets.Tests.Migrations
                     ParentId = table.Column<int>(nullable: true),
                     Right = table.Column<int>(nullable: false),
                     RootId = table.Column<int>(nullable: true),
-                    EntryKey = table.Column<int>(nullable: true)
+                    EntryKey = table.Column<int>(nullable: true),
+                    NodeInstanceId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {

@@ -24,6 +24,10 @@ namespace EfCore.NestedSets
                 .Property(n => n.RootId)
                 .IsRequired(false);
 
+
+           // modelBuilder.Entity<T>()
+             //   .Ignore(b => b.Moving);
+
         }
     }
 }
